@@ -1,35 +1,45 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 val versions: Map<String, String> by rootProject.extra
 
-intellij {
-    version.set(versions["intellij-version"])
-    plugins.set(listOf(
-        "Gherkin:${versions["gherkin"]}"
-    ))
+dependencies {
+    implementation("io.cucumber:tag-expressions:6.0.0")
+
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["idea-version"]}")
+        plugins("Gherkin:${versions["gherkin"]}")
+    }
 }
 
-dependencies {
-    implementation("io.cucumber:tag-expressions:4.1.0")
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
 }
 
 tasks {
     tasks {
         withType<JavaCompile> {
-            sourceCompatibility = "11"
-            targetCompatibility = "11"
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
         }
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions.jvmTarget = "11"
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
         }
     }
-    buildSearchableOptions {
-        enabled = false
-    }
+
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
+    }
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
     }
 }

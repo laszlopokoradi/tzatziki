@@ -1,0 +1,13 @@
+<ivy-module version="2.0">
+  <info organisation="bundledPlugin" module="org.jetbrains.kotlin" revision="2024.2+895"/>
+  <configurations>
+    <conf name="default" visibility="public"/>
+  </configurations>
+  <publications>
+    <artifact name="/Users/LaszloPokoradi/.gradle/caches/8.10/transforms/3eacd66bdcde59052f2a1dfe80fa5eaa/transformed/ideaIC-2024.2-win/plugins/Kotlin" type="directory" conf="default"/>
+  </publications>
+  <dependencies>
+    <dependency org="bundledPlugin" name="com.intellij.java" rev="242.20224.300+440"/>
+    <dependency org="bundledModule" name="intellij.platform.collaborationTools" rev="242.20224.300+450"/>
+  </dependencies>
+</ivy-module>

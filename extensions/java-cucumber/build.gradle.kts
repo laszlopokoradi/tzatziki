@@ -1,38 +1,45 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 val versions: Map<String, String> by rootProject.extra
 
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
 dependencies {
     implementation(project(":common"))
     implementation(project(":plugin-tzatziki"))
+
+    intellijPlatform {
+        intellijIdeaCommunity( "${versions["idea-version"]}")
+        plugins("gherkin:${versions["gherkin"]}", "cucumber-java:${versions["cucumberJava"]}")
+        bundledPlugins("com.intellij.java")
+    }
 }
 
-intellij {
-    version.set(versions["intellij-version"])
-
-    plugins.set(listOf(
-        "java",
-        "Gherkin:${versions["gherkin"]}",
-        "cucumber-java:${versions["cucumberJava"]}"
-    ))
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
 }
 
 tasks {
 
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
-    buildSearchableOptions {
-        enabled = false
-    }
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
     }

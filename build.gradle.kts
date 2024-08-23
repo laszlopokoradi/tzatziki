@@ -2,12 +2,25 @@
 
 import java.net.URI
 
-allprojects {
-    group = "io.nimbly.tzatziki"
-    version = "17.4.0"
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-val notes by extra {"""
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
+}
+
+allprojects {
+    group = "io.nimbly.tzatziki"
+    version = "18.0.0"
+}
+
+val notes by extra {
+    """
        <b>Please kindly report any problem... and Rate &amp; Review this plugin !</b><br/>
        <br/>
        Change notes :
@@ -87,48 +100,18 @@ val notes by extra {"""
 //    const val PLATFORM_TYPE_RUSTROVER = "RR"
 //    const val PLATFORM_TYPE_FLEET = "FLIJ"
 
-//val versions by extra {
-//    mapOf(
-//        "intellij-version" to "IU-2022.3.1",
-//        "cucumberJavascript" to "223.7571.113", // https://plugins.jetbrains.com/plugin/7418-cucumber-js
-//        "gherkin" to "223.7571.113",            //https://plugins.jetbrains.com/plugin/9164-gherkin/versions
-//        "properties" to "223.7571.117",         //https://plugins.jetbrains.com/plugin/11594-properties/versions
-//        "psiViewer" to "223-SNAPSHOT",          //https://plugins.jetbrains.com/plugin/227-psiviewer/versions
-//        "cucumberJava" to "223.7571.123",       //https://plugins.jetbrains.com/plugin/7212-cucumber-for-java/versions
-//        "scala" to "2022.3.20",                 //https://plugins.jetbrains.com/plugin/1347-scala/versions
-//    )
-//}
-
 val versions by extra {
     mapOf(
-        "intellij-version" to "IU-2022.3.1",
-
-        "gherkin" to "223.7571.113",        //https://plugins.jetbrains.com/plugin/9164-gherkin/versions
-        "properties" to "223.7571.117",     //https://plugins.jetbrains.com/plugin/11594-properties/versions
-        "psiViewer" to "223-SNAPSHOT",      //https://plugins.jetbrains.com/plugin/227-psiviewer/versions
-        "cucumberJava" to "223.7571.123",   //https://plugins.jetbrains.com/plugin/7212-cucumber-for-java/versions
-        "scala" to "2022.3.20",             //https://plugins.jetbrains.com/plugin/1347-scala/versions
+        "idea-version" to "2024.2",
+        "gherkin" to "242.20224.159",        //https://plugins.jetbrains.com/plugin/9164-gherkin/versions
+        "properties" to "242.20224.155",     //https://plugins.jetbrains.com/plugin/11594-properties/versions
+        "psiViewer" to "242.4697",      //https://plugins.jetbrains.com/plugin/227-psiviewer/versions
+        "cucumberJava" to "242.20224.159",   //https://plugins.jetbrains.com/plugin/7212-cucumber-for-java/versions
+        "scala" to "2024.2.1",             //https://plugins.jetbrains.com/plugin/1347-scala/versions
     )
 }
 
-val versions_211 by extra {
-    mapOf(
-        "intellij-version" to "IU-211.7142.45",
-        "gherkin" to "211.6693.111",
-        "cucumberJava" to "211.6693.111",
-        "properties" to "211.6693.44",
-        "scala" to "2021.1.17")
-}
-
-allprojects {
-
-    repositories {
-        mavenCentral()
-        maven {
-            url = URI("https://oss.sonatype.org/content/repositories/snapshots/")
-        }
-        maven {
-            url = URI("https://dl.bintray.com/jetbrains/intellij-plugin-service")
-        }
-    }
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
 }

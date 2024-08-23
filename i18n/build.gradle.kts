@@ -1,13 +1,11 @@
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 val versions: Map<String, String> by rootProject.extra
-
-intellij {
-    version.set(versions["intellij-version"])
-}
 
 dependencies {
     implementation("javazoom:jlayer:1.0.1")
@@ -16,22 +14,39 @@ dependencies {
     implementation("org.apache.commons:commons-csv:1.10.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("commons-codec:commons-codec:1.15")
+
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["idea-version"]}")
+    }
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
 }
 
 tasks {
     tasks {
         withType<JavaCompile> {
-            sourceCompatibility = "11"
-            targetCompatibility = "11"
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
         }
+
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions.jvmTarget = "11"
+            compilerOptions {
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
         }
     }
-    buildSearchableOptions {
-        enabled = false
-    }
+
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
+    }
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
     }
 }

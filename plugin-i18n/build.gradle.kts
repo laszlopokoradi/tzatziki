@@ -1,6 +1,8 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 group = "io.nimbly.translation"
@@ -28,37 +30,54 @@ val notes by extra {"""
       """
 }
 
-val versions by extra {
-    mapOf(
-        "intellij-version" to "IU-2022.3.1",
-    )
-}
-
-intellij {
-    version.set(versions["intellij-version"])
-}
+val versions: Map<String, String> by rootProject.extra
 
 dependencies {
     implementation(project(":i18n"))
+
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["idea-version"]}")
+    }
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
+
+    pluginConfiguration {
+        vendor {
+            name.set("Maxime HAMM")
+        }
+        changeNotes.set(notes)
+
+        ideaVersion {
+            sinceBuild.set("242")
+        }
+    }
+
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaCommunity, "2024.2")
+        }
+    }
+
+    publishing {
+        token.set(System.getProperty("PublishToken"))
+    }
+
+
 }
 
 tasks {
-
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
+
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
-
-    patchPluginXml {
-
-        // Check build number here : https://www.jetbrains.com/idea/download/other.html
-        sinceBuild.set("222.4554.10")    // 2021.2.4
-        untilBuild.set("241.*")
-
-        changeNotes.set(notes)
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     buildSearchableOptions {
@@ -71,15 +90,11 @@ tasks {
     instrumentedJar {
         // exclude("META-INF/*") // Workaround for runPluginVerifier duplicate plugins...
     }
-
-    runPluginVerifier {
-        ideVersions.set(
-            listOf("IU-2022.3.1"))
-    }
-
-    publishPlugin {
-        val t = System.getProperty("PublishToken")
-        token.set(t)
-    }
 }
 
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}

@@ -1,20 +1,11 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
-intellij {
-    version.set("IU-2021.3.1")
-    plugins.set(listOf(
-        "Gherkin:213.5744.223",
-        "Kotlin",
-        "org.intellij.intelliLang",
-        "java",
-        "JUnit",
-        "cucumber-java:213.5744.125",
-        "com.intellij.properties:213.6461.46"
-    ))
-}
+val versions: Map<String, String> by rootProject.extra
 
 dependencies {
     testImplementation(project(":plugin-tzatziki"))
@@ -23,25 +14,52 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testImplementation("org.apache.logging.log4j:log4j-api:2.14.1")
-    testImplementation("org.apache.logging.log4j:log4j-core:2.14.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
+    testImplementation("org.apache.logging.log4j:log4j-api:2.23.1")
+    testImplementation("org.apache.logging.log4j:log4j-core:2.23.1")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine");
+
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["idea-version"]}")
+        plugins(
+            "Gherkin:${versions["gherkin"]}",
+            "cucumber-java:${versions["cucumberJava"]}",
+            "org.intellij.scala:${versions["scala"]}",
+            "com.intellij.properties:${versions["properties"]}",
+            "PsiViewer:${versions["psiViewer"]}",
+        )
+        bundledPlugins("org.intellij.intelliLang", "com.intellij.java", "org.jetbrains.kotlin")
+
+    }
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
+
+
 }
 
 tasks {
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
-    buildSearchableOptions {
-        enabled = false
-    }
+
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
+    }
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
     }
 }
