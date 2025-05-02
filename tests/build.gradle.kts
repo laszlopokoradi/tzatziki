@@ -1,22 +1,52 @@
-plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+val versions: Map<String, String> by rootProject.extra
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-intellij {
-    version.set("IU-2021.3.1")
-    plugins.set(listOf(
-        "Gherkin:213.5744.223",
-        "Kotlin",
-        "org.intellij.intelliLang",
-        "java",
-        "JUnit",
-        "cucumber-java:213.5744.125",
-        "com.intellij.properties:213.6461.46"
-    ))
+plugins {
+    kotlin("jvm") version "2.1.20"
+    id("org.jetbrains.intellij.platform") version "2.5.0"
 }
+
+//intellij {
+//    version.set("IU-2021.3.1")
+//    plugins.set(listOf(
+//        "Gherkin:213.5744.223",
+//        "Kotlin",
+//        "org.intellij.intelliLang",
+//        "java",
+//        "JUnit",
+//        "cucumber-java:213.5744.125",
+//        "com.intellij.properties:213.6461.46"
+//    ))
+//}
 
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["intellij-version"]}")
+
+        bundledPlugins(
+            listOf(
+                "com.intellij.java",
+                "org.jetbrains.kotlin",
+                "org.intellij.intelliLang",
+                "JUnit",
+            )
+        )
+
+        plugins (
+            listOf(
+                "Gherkin:${versions["gherkin"]}",
+                "cucumber-java:${versions["cucumberJava"]}",
+                "com.intellij.properties:${versions["properties"]}",
+            )
+        )
+    }
+
     testImplementation(project(":plugin-tzatziki"))
     testImplementation(project(":common"))
 
@@ -32,16 +62,15 @@ dependencies {
 
 tasks {
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
-    buildSearchableOptions {
-        enabled = false
-    }
+
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
     }
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
 }

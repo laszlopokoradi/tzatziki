@@ -1,37 +1,53 @@
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    kotlin("jvm") version "2.1.20"
+    id("org.jetbrains.intellij.platform") version "2.5.0"
 }
 
 val versions: Map<String, String> by rootProject.extra
 
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("${versions["intellij-version"]}")
+
+        bundledPlugins(
+            listOf(
+                "com.intellij.java"
+            )
+        )
+
+        plugins(
+            listOf(
+                "org.intellij.scala:${versions["scala"]}",
+                "Gherkin:${versions["gherkin"]}",
+            )
+        )
+    }
+
     implementation(project(":common"))
     implementation(project(":plugin-tzatziki"))
 }
 
-intellij {
-    version.set(versions["intellij-version"])
-
-    plugins.set(listOf(
-        "java",
-        "org.intellij.scala:${versions["scala"]}",
-        "Gherkin:${versions["gherkin"]}",
-    ))
-}
-
 tasks {
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
-    buildSearchableOptions {
-        enabled = false
-    }
+//    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//        kotlinOptions.jvmTarget = "21"
+//    }
+
     jar {
         archiveBaseName.set(rootProject.name + "-" + project.name)
     }
+}
+
+intellijPlatform {
+    buildSearchableOptions = false
 }

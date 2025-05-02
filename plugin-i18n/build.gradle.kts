@@ -1,6 +1,15 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.7.20"
-    id("org.jetbrains.intellij") version "1.13.1"
+    kotlin("jvm") version "2.1.20"
+    id("org.jetbrains.intellij.platform") version "2.5.0"
 }
 
 group = "io.nimbly.translation"
@@ -34,52 +43,55 @@ val versions by extra {
     )
 }
 
-intellij {
-    version.set(versions["intellij-version"])
-}
+//intellij {
+//    version.set(versions["intellij-version"])
+//}
+
+
 
 dependencies {
     implementation(project(":i18n"))
 }
 
 tasks {
-
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
+//    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//        kotlinOptions.jvmTarget = "21"
+//    }
 
     patchPluginXml {
-
         // Check build number here : https://www.jetbrains.com/idea/download/other.html
-        sinceBuild.set("222.4554.10")    // 2021.2.4
-        untilBuild.set("243.*")
+        sinceBuild.set("251")
 
         changeNotes.set(notes)
-    }
-
-    buildSearchableOptions {
-        enabled = false
     }
 
     jar {
         archiveBaseName.set("translation")
     }
+
     instrumentedJar {
         // exclude("META-INF/*") // Workaround for runPluginVerifier duplicate plugins...
     }
+}
 
-    runPluginVerifier {
-        ideVersions.set(
-            listOf("IU-2022.3.1"))
+intellijPlatform {
+    buildSearchableOptions = false
+
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1")
+            select {
+                sinceBuild = "251"
+            }
+        }
     }
 
-    publishPlugin {
-        val t = System.getProperty("PublishToken")
-        token.set(t)
+    publishing  {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
     }
 }
 
